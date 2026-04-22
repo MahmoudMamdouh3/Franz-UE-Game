@@ -1,5 +1,6 @@
 #include "BaseCharacter.h"
 #include "Net/UnrealNetwork.h" // Required for DOREPLIFETIME
+#include "CoworkerCharacter.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -36,13 +37,18 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	// Only the server is allowed to calculate health to keep the game fair and synced
 	if (HasAuthority() && !bIsDead)
 	{
 		CurrentHealth -= ActualDamage;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 
-		// If the will to live drops to 0, they die
+		// --- NEW: Print the Health to the screen! ---
+		if (GEngine)
+		{
+			FString HealthMsg = FString::Printf(TEXT("%s Health: %f / %f"), *GetName(), CurrentHealth, MaxHealth);
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, HealthMsg);
+		}
+
 		if (CurrentHealth <= 0.0f)
 		{
 			Die();
@@ -67,13 +73,15 @@ void ABaseCharacter::OnRep_IsDead()
 	}
 }
 
-void ABaseCharacter::Die()
+void ACoworkerCharacter::Die()
 {
-	if (bIsDead) return; // Prevent double executions
-	
-	bIsDead = true;
+	Super::Die(); 
 
-	// For now, we just disable their collision so the bodies don't block the narrow corridors.
-	// We will add the actual brutal death animations in Phase 2.
-	SetActorEnableCollision(false);
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Purple, TEXT("A Coworker has been defeated."));
+	}
+
+	// --- NEW: Destroy the body instantly so we know he died ---
+	Destroy();
 }

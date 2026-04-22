@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseCharacter.h" // Hijacked: Now inheriting from our master class!
+#include "BaseCharacter.h" // Inheriting from our master class
 #include "Logging/LogMacros.h"
 #include "FranzCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UInputMappingContext; // NEW: Added this forward declaration
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(abstract)
-class AFranzCharacter : public ABaseCharacter // Hijacked: Changed ACharacter to ABaseCharacter
+class AFranzCharacter : public ABaseCharacter 
 {
 	GENERATED_BODY()
 
@@ -28,6 +29,13 @@ class AFranzCharacter : public ABaseCharacter // Hijacked: Changed ACharacter to
 	UCameraComponent* FollowCamera;
 	
 protected:
+
+	// --- NEW: Added BeginPlay declaration ---
+	virtual void BeginPlay() override;
+
+	// --- NEW: Added the Mapping Context variable ---
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+	UInputMappingContext* DefaultMappingContext;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -45,7 +53,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
-	// --- NEW: Brutal Combat Action ---
+	// --- Brutal Combat Action ---
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* AttackAction;
 
@@ -58,7 +66,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	
-	// --- NEW: Combat Function ---
+	// --- Combat Function ---
 	void Attack();
 
 public:

@@ -116,3 +116,18 @@ void AFranzCharacter::DoJumpEnd()
 {
 	StopJumping();
 }
+
+void AFranzCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Add Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			// This tells the engine to load the inputs we set in the Blueprint
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}

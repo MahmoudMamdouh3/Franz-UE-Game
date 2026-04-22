@@ -11,6 +11,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Franz.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+#include "TimerManager.h"
 
 AFranzCharacter::AFranzCharacter()
 {
@@ -64,10 +67,13 @@ void AFranzCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AFranzCharacter::Attack()
 {
-	// We will implement the actual punching logic and animations here next
-	if (GEngine)
+	if (AttackMontage)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Franz Swings Brutally!"));
+		PlayAnimMontage(AttackMontage);
+		
+		// Set a timer to trigger the actual hitbox 0.4 seconds from now (when the fist extends)
+		FTimerHandle AttackTimerHandle;
+		GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AFranzCharacter::Server_PerformMeleeHit, 0.4f, false);
 	}
 }
 
@@ -128,6 +134,44 @@ void AFranzCharacter::BeginPlay()
 		{
 			// This tells the engine to load the inputs we set in the Blueprint
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}
+
+// Because it is a Server RPC, we MUST add "_Implementation" to the name here
+void AFranzCharacter::Server_PerformMeleeHit_Implementation()
+{
+	FVector StartLoc = GetActorLocation();
+	FVector ForwardVec = GetActorForwardVector();
+	// Shoot the hitbox 100 units right in front of Franz's face
+	FVector EndLoc = StartLoc + (ForwardVec * 100.0f); 
+
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this); // Make sure Franz doesn't punch himself
+
+	// Draw a sphere trace (invisible boxing glove)
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult, 
+		StartLoc, 
+		EndLoc, 
+		FQuat::Identity,
+		ECC_Pawn, // We only want to punch things that are Pawns/Characters
+		FCollisionShape::MakeSphere(40.0f), 
+		QueryParams
+	);
+
+	// Draw a red debug sphere in the game so we can actually see the hitbox!
+	DrawDebugSphere(GetWorld(), EndLoc, 40.0f, 12, FColor::Red, false, 2.0f);
+
+	if (bHit && HitResult.GetActor())
+	{
+		// If we hit a Coworker, apply 25 damage to them!
+		UGameplayStatics::ApplyDamage(HitResult.GetActor(), 25.0f, GetController(), this, UDamageType::StaticClass());
+		
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Punched: %s"), *HitResult.GetActor()->GetName()));
 		}
 	}
 }

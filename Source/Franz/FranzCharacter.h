@@ -56,6 +56,11 @@ protected:
 	// --- Brutal Combat Action ---
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* AttackAction;
+	
+	// --- COMBAT ANIMATIONS ---
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	class UAnimMontage* AttackMontage;
+	
 
 public:
 	AFranzCharacter();	
@@ -68,6 +73,11 @@ protected:
 	
 	// --- Combat Function ---
 	void Attack();
+	
+	// --- MELEE COMBAT HITBOX ---
+	// This tells the Server to calculate the damage so clients can't cheat
+	UFUNCTION(Server, Reliable)
+	void Server_PerformMeleeHit();
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Input")

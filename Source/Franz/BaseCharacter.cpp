@@ -1,6 +1,5 @@
 #include "BaseCharacter.h"
 #include "Net/UnrealNetwork.h" // Required for DOREPLIFETIME
-#include "CoworkerCharacter.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -73,15 +72,10 @@ void ABaseCharacter::OnRep_IsDead()
 	}
 }
 
-void ACoworkerCharacter::Die()
+void ABaseCharacter::Die()
 {
-	Super::Die(); 
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Purple, TEXT("A Coworker has been defeated."));
-	}
-
-	// --- NEW: Destroy the body instantly so we know he died ---
-	Destroy();
+	if (bIsDead) return; 
+	
+	bIsDead = true;
+	SetActorEnableCollision(false);
 }

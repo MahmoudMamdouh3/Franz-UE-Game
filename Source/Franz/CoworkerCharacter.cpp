@@ -1,13 +1,11 @@
 #include "CoworkerCharacter.h"
 
-// Notice the ACoworkerCharacter:: prefix here!
 ACoworkerCharacter::ACoworkerCharacter()
 {
 	MaxHealth = 75.0f;
 	CurrentHealth = MaxHealth;
 }
 
-// Notice the ACoworkerCharacter:: prefix here too!
 void ACoworkerCharacter::Die()
 {
 	Super::Die(); 

@@ -12,7 +12,17 @@ class FRANZ_API ACoworkerCharacter : public ABaseCharacter
 public:
 	ACoworkerCharacter();
 
+	// --- NEW: Expose this so the Behavior Tree can trigger it! ---
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void MeleeAttack();
+
 protected:
-	// We override the base Die function to add custom Coworker logic
 	virtual void Die() override;
+
+	// --- NEW: Coworker Attack variables ---
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	class UAnimMontage* AttackMontage;
+
+	UFUNCTION(Server, Reliable)
+	void Server_PerformMeleeHit();
 };

@@ -61,6 +61,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	class UAnimMontage* AttackMontage;
 	
+	// --- UI SYSTEM ---
+	// The Blueprint widget class we will assign in the editor
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<class UUserWidget> PlayerHUDClass;
+
+	// The actual widget instance once it's created
+	UPROPERTY()
+	class UUserWidget* PlayerHUDWidget;
 
 public:
 	AFranzCharacter();	

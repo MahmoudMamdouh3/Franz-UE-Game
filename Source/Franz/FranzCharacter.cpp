@@ -14,6 +14,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "Blueprint/UserWidget.h"
+
 
 AFranzCharacter::AFranzCharacter()
 {
@@ -134,6 +136,16 @@ void AFranzCharacter::BeginPlay()
 		{
 			// This tells the engine to load the inputs we set in the Blueprint
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+	// --- Initialize HUD ---
+	// IsLocallyControlled() ensures the server doesn't draw Franz's UI on its own screen
+	if (IsLocallyControlled() && PlayerHUDClass)
+	{
+		PlayerHUDWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerHUDClass);
+		if (PlayerHUDWidget)
+		{
+			PlayerHUDWidget->AddToViewport();
 		}
 	}
 }

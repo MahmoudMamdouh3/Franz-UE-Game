@@ -166,12 +166,17 @@ void AFranzCharacter::Server_PerformMeleeHit_Implementation()
 
 	if (bHit && HitResult.GetActor())
 	{
-		// If we hit a Coworker, apply 25 damage to them!
+		// --- FIX: Save the name BEFORE we deal damage! ---
+		FString TargetName = HitResult.GetActor()->GetName();
+
+		// Apply the damage (If this is the 3rd punch, the Coworker is Destroyed here)
 		UGameplayStatics::ApplyDamage(HitResult.GetActor(), 25.0f, GetController(), this, UDamageType::StaticClass());
 		
+		// Safely print the name we saved in memory, avoiding the Access Violation
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Punched: %s"), *HitResult.GetActor()->GetName()));
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Punched: %s"), *TargetName));
 		}
 	}
+	
 }

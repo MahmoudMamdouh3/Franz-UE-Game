@@ -3,17 +3,21 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "Components/CapsuleComponent.h"  // Add this line!
 
 ACoworkerCharacter::ACoworkerCharacter()
 {
+
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+    
+	// Force the mesh to sit correctly inside the capsule
+	GetMesh()->SetRelativeLocationAndRotation(
+		FVector(0.0f, 0.0f, -96.0f),      // Z = negative capsule half-height
+		FRotator(0.0f, -90.0f, 0.0f)       // -90 yaw so he faces forward
+	);
+
 	MaxHealth = 75.0f;
 	CurrentHealth = MaxHealth;
-
-	// --- FIX: Give him a slow, terrifying horror walk (Default is 500) ---
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 150.0f; 
-	}
 }
 
 void ACoworkerCharacter::Die()

@@ -215,3 +215,21 @@ void AFranzCharacter::Die()
 	// 2. Call the master function to trigger the physical ragdoll collapse
 	Super::Die();
 }
+
+float AFranzCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	// 1. Let the master class do the health math and play the flinch animation
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// 2. If Franz actually took damage, violently shake the player's screen
+	if (ActualDamage > 0.0f && HitCameraShakeClass)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			// This built-in function safely triggers the shake only for this specific player
+			PC->ClientStartCameraShake(HitCameraShakeClass);
+		}
+	}
+
+	return ActualDamage;
+}

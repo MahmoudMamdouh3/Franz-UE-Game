@@ -76,6 +76,13 @@ protected:
 	// --- GAME OVER UI ---
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> GameOverHUDClass;
+	
+	// --- THE JUICE (CAMERA SHAKE) ---
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	TSubclassOf<class UCameraShakeBase> HitCameraShakeClass;
+
+	// Overriding the master TakeDamage function just for Franz
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 
 public:

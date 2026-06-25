@@ -4,6 +4,7 @@
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
 #include "Components/CapsuleComponent.h"  // Add this line!
+#include "FranzCharacter.h"
 
 ACoworkerCharacter::ACoworkerCharacter()
 {
@@ -20,17 +21,6 @@ ACoworkerCharacter::ACoworkerCharacter()
 	CurrentHealth = MaxHealth;
 }
 
-void ACoworkerCharacter::Die()
-{
-	Super::Die(); 
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Purple, TEXT("A Coworker has been defeated."));
-	}
-
-	Destroy();
-}
 
 void ACoworkerCharacter::MeleeAttack()
 {
@@ -69,5 +59,16 @@ void ACoworkerCharacter::Server_PerformMeleeHit_Implementation()
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Franz took damage from Coworker!")));
 		}
+	}
+}
+void ACoworkerCharacter::Die()
+{
+	// 1. Let the master class trigger the physical ragdoll
+	Super::Die();
+
+	// 2. Find the player and grant them 1 kill
+	if (AFranzCharacter* Player = Cast<AFranzCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		Player->AddKill();
 	}
 }

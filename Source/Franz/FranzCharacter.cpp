@@ -33,6 +33,8 @@ AFranzCharacter::AFranzCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+	
+	KillCount = 0;
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -232,4 +234,9 @@ float AFranzCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	}
 
 	return ActualDamage;
+}
+
+void AFranzCharacter::AddKill()
+{
+	KillCount++;
 }

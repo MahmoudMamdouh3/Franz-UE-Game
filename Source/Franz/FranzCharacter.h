@@ -87,6 +87,11 @@ protected:
 
 public:
 	AFranzCharacter();	
+	// --- SCORE SYSTEM ---
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
+	int32 KillCount;
+
+	void AddKill();
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

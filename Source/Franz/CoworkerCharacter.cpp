@@ -24,6 +24,19 @@ ACoworkerCharacter::ACoworkerCharacter()
 
 void ACoworkerCharacter::MeleeAttack()
 {
+	if (AFranzCharacter* Player = Cast<AFranzCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		if (Player->GetCapsuleComponent()->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
+		{
+			// The exact moment Franz dies, disconnect the AI Controller. They will freeze completely.
+			if (Controller)
+			{
+				Controller->UnPossess();
+			}
+			return; 
+		}
+	}
+
 	if (AttackMontage)
 	{
 		PlayAnimMontage(AttackMontage);
@@ -52,12 +65,16 @@ void ACoworkerCharacter::Server_PerformMeleeHit_Implementation()
 
 	if (bHit && HitResult.GetActor())
 	{
-		// Coworkers hit a bit weaker than Franz (20 damage)
-		UGameplayStatics::ApplyDamage(HitResult.GetActor(), 20.0f, GetController(), this, UDamageType::StaticClass());
-		
-		if (GEngine)
+		// 2. FRIENDLY FIRE FIX: We cast directly to Franz. If the fist hits another Coworker, this fails and no damage is dealt!
+		if (AFranzCharacter* HitPlayer = Cast<AFranzCharacter>(HitResult.GetActor()))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Franz took damage from Coworker!")));
+			// 3. DAMAGE NERF: Dropped from 20 to 5 damage per punch
+			UGameplayStatics::ApplyDamage(HitPlayer, 5.0f, GetController(), this, UDamageType::StaticClass());
+			
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Franz took 5 damage!")));
+			}
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "CoworkerCharacter.h"
 #include "TimerManager.h"
+#include "FranzCharacter.h"
+#include "Components/CapsuleComponent.h"
 
 AEnemySpawner::AEnemySpawner()
 {
@@ -13,7 +15,7 @@ AEnemySpawner::AEnemySpawner()
 	RootComponent = SpawnVolume;
 
 	// Default to dropping a new enemy every 5 seconds
-	SpawnInterval = 5.0f; 
+	SpawnInterval = 8.0f; 
 }
 
 void AEnemySpawner::BeginPlay()
@@ -29,19 +31,26 @@ void AEnemySpawner::BeginPlay()
 
 void AEnemySpawner::SpawnEnemy()
 {
+	// 1. Check if Franz is dead. If he is, kill the Spawner timer permanently!
+	if (AFranzCharacter* Player = Cast<AFranzCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		if (Player->GetCapsuleComponent()->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
+		{
+			GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+			return;
+		}
+	}
+
 	if (EnemyClass)
 	{
-		// 1. Calculate a completely random X,Y,Z coordinate inside our Box Component
 		FVector SpawnOrigin = SpawnVolume->Bounds.Origin;
 		FVector SpawnExtent = SpawnVolume->Bounds.BoxExtent;
 		FVector SpawnLocation = UKismetMathLibrary::RandomPointInBoundingBox(SpawnOrigin, SpawnExtent);
 
-		// 2. Set spawning rules so they don't get stuck in the floor
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		// 3. Drop them into the arena
 		GetWorld()->SpawnActor<ACoworkerCharacter>(EnemyClass, SpawnLocation, SpawnRotation, SpawnParams);
 	}
 }

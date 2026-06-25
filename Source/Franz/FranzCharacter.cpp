@@ -35,6 +35,10 @@ AFranzCharacter::AFranzCharacter()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	
 	KillCount = 0;
+	// Override the master class health to make Franz a tank
+	MaxHealth = 500.0f;
+	CurrentHealth = MaxHealth;
+	
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);

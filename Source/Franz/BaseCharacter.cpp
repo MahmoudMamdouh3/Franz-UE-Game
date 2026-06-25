@@ -1,5 +1,8 @@
 #include "BaseCharacter.h"
 #include "Net/UnrealNetwork.h" // Required for DOREPLIFETIME
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -82,7 +85,26 @@ void ABaseCharacter::OnRep_IsDead()
 void ABaseCharacter::Die()
 {
 	if (bIsDead) return; 
-	
 	bIsDead = true;
-	SetActorEnableCollision(false);
+
+	// 1. Turn off the invisible collision cylinder so we don't block the floor
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	// 2. Turn ON the physics skeleton so the body collapses
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+
+	// 3. Kill the movement engine
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+
+	// 4. Disconnect the brain (Whether it's Franz's keyboard or the Coworker's AI)
+	if (Controller)
+	{
+		Controller->UnPossess();
+	}
 }

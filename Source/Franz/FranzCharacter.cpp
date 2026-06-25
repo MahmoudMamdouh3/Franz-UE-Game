@@ -192,3 +192,26 @@ void AFranzCharacter::Server_PerformMeleeHit_Implementation()
 	}
 	
 }
+void AFranzCharacter::Die()
+{
+	// 1. Spawn the Game Over screen BEFORE we kill the controller
+	if (IsLocallyControlled() && GameOverHUDClass)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			UUserWidget* GameOverWidget = CreateWidget<UUserWidget>(PC, GameOverHUDClass);
+			if (GameOverWidget)
+			{
+				GameOverWidget->AddToViewport();
+				
+				// Show the mouse and lock the game so they can't look around anymore
+				PC->SetShowMouseCursor(true);
+				FInputModeUIOnly InputMode;
+				PC->SetInputMode(InputMode);
+			}
+		}
+	}
+
+	// 2. Call the master function to trigger the physical ragdoll collapse
+	Super::Die();
+}

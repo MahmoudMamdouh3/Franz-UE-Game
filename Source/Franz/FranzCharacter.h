@@ -69,6 +69,13 @@ protected:
 	// The actual widget instance once it's created
 	UPROPERTY()
 	class UUserWidget* PlayerHUDWidget;
+	
+	// Overriding the master death function
+	virtual void Die() override;
+
+	// --- GAME OVER UI ---
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<class UUserWidget> GameOverHUDClass;
 
 
 public:

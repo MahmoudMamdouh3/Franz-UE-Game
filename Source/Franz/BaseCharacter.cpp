@@ -41,7 +41,6 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		CurrentHealth -= ActualDamage;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 
-		// --- NEW: Print the Health to the screen! ---
 		if (GEngine)
 		{
 			FString HealthMsg = FString::Printf(TEXT("%s Health: %f / %f"), *GetName(), CurrentHealth, MaxHealth);
@@ -51,6 +50,14 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		if (CurrentHealth <= 0.0f)
 		{
 			Die();
+		}
+		else 
+		{
+			// --- NEW: Play the flinch animation if they survived the hit! ---
+			if (HitReactMontage)
+			{
+				PlayAnimMontage(HitReactMontage);
+			}
 		}
 	}
 

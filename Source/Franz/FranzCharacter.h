@@ -70,6 +70,7 @@ protected:
 	UPROPERTY()
 	class UUserWidget* PlayerHUDWidget;
 
+
 public:
 	AFranzCharacter();	
 

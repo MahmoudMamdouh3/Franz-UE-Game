@@ -32,6 +32,10 @@ protected:
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();
+	
+	// --- COMBAT ANIMATIONS ---
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	class UAnimMontage* HitReactMontage;
 
 	// --- DEATH SYSTEM ---
 	UPROPERTY(ReplicatedUsing = OnRep_IsDead, VisibleAnywhere, BlueprintReadOnly, Category = "Stats")

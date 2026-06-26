@@ -36,6 +36,10 @@ protected:
 	// --- COMBAT ANIMATIONS ---
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	class UAnimMontage* HitReactMontage;
+	
+	// --- AUDIO ---
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Audio")
+	class USoundBase* ImpactSound;
 
 	// --- DEATH SYSTEM ---
 	UPROPERTY(ReplicatedUsing = OnRep_IsDead, VisibleAnywhere, BlueprintReadOnly, Category = "Stats")

@@ -5,6 +5,7 @@
 #include "TimerManager.h"
 #include "FranzCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AEnemySpawner::AEnemySpawner()
 {
@@ -31,11 +32,12 @@ void AEnemySpawner::BeginPlay()
 
 void AEnemySpawner::SpawnEnemy()
 {
-	// 1. Check if Franz is dead. If he is, kill the Spawner timer permanently!
-	if (AFranzCharacter* Player = Cast<AFranzCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	// FIX: Ask the world to find Franz's body directly, bypassing the disconnected Player Controller
+	if (AFranzCharacter* Player = Cast<AFranzCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AFranzCharacter::StaticClass())))
 	{
 		if (Player->GetCapsuleComponent()->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
 		{
+			// Franz is dead. Nuke the spawner permanently.
 			GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
 			return;
 		}

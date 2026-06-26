@@ -2,7 +2,7 @@
 #include "Net/UnrealNetwork.h" // Required for DOREPLIFETIME
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -44,12 +44,29 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 		CurrentHealth -= ActualDamage;
 		CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 
+		
+		
 		if (GEngine)
 		{
 			FString HealthMsg = FString::Printf(TEXT("%s Health: %f / %f"), *GetName(), CurrentHealth, MaxHealth);
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, HealthMsg);
 		}
+		if (HasAuthority() && !bIsDead)
+		{
+			CurrentHealth -= ActualDamage;
+			CurrentHealth = FMath::Clamp(CurrentHealth, 0.0f, MaxHealth);
 
+			// --- THE CRUNCH: Play the physical impact sound ---
+			if (ImpactSound)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+			}
+
+			if (GEngine)
+			{
+				FString HealthMsg = FString::Printf(TEXT("%s Health: %f / %f"), *GetName(), CurrentHealth, MaxHealth);
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, HealthMsg);
+			}
 		if (CurrentHealth <= 0.0f)
 		{
 			Die();
@@ -62,6 +79,8 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 				PlayAnimMontage(HitReactMontage);
 			}
 		}
+		
+		
 	}
 
 	return ActualDamage;

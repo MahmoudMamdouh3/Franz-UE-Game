@@ -24,11 +24,12 @@ ACoworkerCharacter::ACoworkerCharacter()
 
 void ACoworkerCharacter::MeleeAttack()
 {
-	if (AFranzCharacter* Player = Cast<AFranzCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	// FIX: Find Franz's physical body in the world directly
+	if (AFranzCharacter* Player = Cast<AFranzCharacter>(UGameplayStatics::GetActorOfClass(GetWorld(), AFranzCharacter::StaticClass())))
 	{
 		if (Player->GetCapsuleComponent()->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
 		{
-			// The exact moment Franz dies, disconnect the AI Controller. They will freeze completely.
+			// The exact moment Franz dies, sever the AI Controller. They will freeze completely.
 			if (Controller)
 			{
 				Controller->UnPossess();
